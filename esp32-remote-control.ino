@@ -4,8 +4,8 @@
 #define LED_BUILTIN 33
 
 // WiFi network name and password:
-const char * networkName = "MGTS_GPON_73A8";
-const char * networkPswd = "NSLPRG5N";
+const char * networkName = "IU4-net";
+const char * networkPswd = "iu4wifivip";
 
 //IP address to send UDP data to:
 // either use the ip address of the server or 
@@ -98,8 +98,11 @@ void loop(){
     else if(strcmp(incomingPacket, "LED_SWITCH") == 0) {
       LedStatus(LED_SWITCH);;
     }
+    else if (incomingPacket[0] == '{') {
+      udp.printf("RECEIVED JSON");
+    }
     else {
-      udp.printf("ERROR MESSAGE");
+      udp.printf("EROROR MESSAGE");
     }
     /*
     switch(incomingPacket) {
