@@ -4,14 +4,14 @@
 #define LED_BUILTIN 33
 
 // WiFi network name and password:
-const char * networkName = "IU4-net";
-const char * networkPswd = "iu4wifivip";
+const char * networkName = "MGTS_GPON_73A8";
+const char * networkPswd = "NSLPRG5N";
 
 //IP address to send UDP data to:
 // either use the ip address of the server or 
 // a network broadcast address
 const char * udpAddress = "89.108.114.104";
-const int udpPort = 50000;
+const int udpPort = 5000;
 
 typedef enum ledStatusVar {
   LED_STATUS,
@@ -19,6 +19,15 @@ typedef enum ledStatusVar {
   LED_OFF,
   LED_SWITCH
 } ledStatusVar;
+
+typedef enum relayStatusVar {
+  RELAY1_STATUS,
+  RELAY1_ON,
+  RELAY1_OFF,
+  RELAY1_SWITCH
+} relayStatusVar;
+
+void LedStatus(int ledStatusVar);
 
 //Are we currently connected?
 boolean connected = false;
@@ -44,7 +53,7 @@ void setup(){
   while(1) {
     if(connected) {
       udp.beginPacket(udpAddress,udpPort);
-      udp.printf("ESP_CODE");
+      udp.printf("ESP_ENTRY");
       udp.endPacket();
       Serial.printf("Send ESP_CODE #%d\n", i++);
     }
@@ -60,10 +69,10 @@ void setup(){
         Serial.printf("UDP packet contents: %s\n", incomingPacket);
       }
     }
-    if(strcmp(incomingPacket, "VERIFIED") == 0) {
+    if(strcmp(incomingPacket, "1234") == 0) {
       if(connected) {
         udp.beginPacket(udpAddress,udpPort);
-        udp.printf("VERIFIED");
+        udp.printf("1234");
         udp.endPacket();
         Serial.printf("Send VERIFIED\n");
       }
@@ -75,6 +84,7 @@ void setup(){
 }
 
 void loop(){
+  
   int packetSize = udp.parsePacket();
   if (packetSize) {
     Serial.printf("Received %d bytes from %s, port %d\n", packetSize, udp.remoteIP().toString().c_str(), udp.remotePort());
@@ -96,7 +106,7 @@ void loop(){
       LedStatus(LED_OFF);
     }
     else if(strcmp(incomingPacket, "LED_SWITCH") == 0) {
-      LedStatus(LED_SWITCH);;
+      LedStatus(LED_SWITCH);
     }
     else if (incomingPacket[0] == '{') {
       udp.printf("RECEIVED JSON");
@@ -104,22 +114,6 @@ void loop(){
     else {
       udp.printf("EROROR MESSAGE");
     }
-    /*
-    switch(incomingPacket) {
-      case "LED_STATUS":
-        LedStatus(0) == true ? udp.printf("LED_ON") : udp.printf("LED_OFF");
-        break;
-      case "LED_ON":
-        LedStatus(1) == true ? udp.printf("LED_ON") : udp.printf("LED_OFF");
-        break;
-      case "LED_OFF":
-        LedStatus(2) == true ? udp.printf("LED_ON") : udp.printf("LED_OFF");
-        break;
-      case "LED_SWITCH":
-        LedStatus(3) == true ? udp.printf("LED_ON") : udp.printf("LED_OFF");
-        break;
-    }
-    */
     udp.endPacket();
   }
 
